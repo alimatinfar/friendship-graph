@@ -1,5 +1,7 @@
 import {type Edge, type Node} from "@xyflow/react";
 import type {PersonNodeType} from "../components/Sections/PersonNode/PersonNode.types.ts";
+import calculateDegrees from "./calculateDegrees.ts";
+import calculateBetweenness from "./calculateBetweenness.ts";
 
 function createFakeNodesAndEdges() {
 
@@ -55,8 +57,22 @@ function createFakeNodesAndEdges() {
     };
   });
 
+  const nodeIds = nodes.map((n) => n.id);
+
+  const degreeMap = calculateDegrees(nodeIds, edges);
+  const betweennessMap = calculateBetweenness(nodeIds, edges);
+
+  const enrichedNodes = nodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      degree: degreeMap[node.id],
+      betweenness: betweennessMap[node.id],
+    },
+  }));
+
   return {
-    nodes, edges
+    nodes: enrichedNodes, edges
   }
 }
 

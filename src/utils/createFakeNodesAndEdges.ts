@@ -1,4 +1,4 @@
-import {type Edge, type Node} from "@xyflow/react";
+import {type Edge, MarkerType, type Node} from "@xyflow/react";
 import type {PersonNodeType} from "../components/Sections/PersonNode/PersonNode.types.ts";
 import calculateDegrees from "./calculateDegrees.ts";
 import calculateBetweenness from "./calculateBetweenness.ts";
@@ -32,30 +32,50 @@ function createFakeNodesAndEdges() {
   const generatePhone = (): string =>  "09" + Math.floor(100000000 + Math.random() * 900000000);
 
 
-  const nodes: Node<PersonNodeType>[] = Array.from({ length: 400 }, () => ({
-    id: crypto.randomUUID(),
-    position: {
-      x: Math.random() * 2000,
-      y: Math.random() * 2000,
-    },
-    data: {
-      firstName: randomItem(firstNames),
-      lastName: randomItem(lastNames),
-      phone: generatePhone(),
-    },
-    type: "person",
-  }));
+  const columns = 20
+  const gapX = 200;
+  const gapY = 120;
+
+  const nodes: Node<PersonNodeType>[] = Array.from(
+    { length: 400 },
+    (_, i) => {
+      const row = Math.floor(i / columns);
+      const col = i % columns;
+
+      return {
+        id: crypto.randomUUID(),
+        position: {
+          x: col * gapX,
+          y: row * gapY,
+        },
+        data: {
+          firstName: randomItem(firstNames),
+          lastName: randomItem(lastNames),
+          phone: generatePhone(),
+        },
+        type: "person",
+      };
+    }
+  );
 
   const edges: Edge[] = Array.from({ length: 600 }, () => {
     const sourceNode = nodes[Math.floor(Math.random() * nodes.length)];
     const targetNode = nodes[Math.floor(Math.random() * nodes.length)];
 
+    if (sourceNode.id === targetNode.id) return null;
+
     return {
       id: crypto.randomUUID(),
       source: sourceNode.id,
       target: targetNode.id,
+      type: "smoothstep",
+      animated: false,
+      style: { stroke: "#999", strokeWidth: 1 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
     };
-  });
+  }).filter(Boolean) as Edge[]
 
   const nodeIds = nodes.map((n) => n.id);
 

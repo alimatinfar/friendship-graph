@@ -24,7 +24,9 @@ export default function PersonNode({ data }: NodeProps<PersonNodeType>) {
 
       {open && (
         <div style={{ marginTop: 8, fontSize: 12 }}>
-          <div>📱 {data.phone}</div>
+          <div>mobile: {data.phone}</div>
+          <div>degree: {data.degree}</div>
+          <div>betweenness: {data.betweenness}</div>
         </div>
       )}
 
